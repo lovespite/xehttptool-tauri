@@ -1,0 +1,86 @@
+.item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.item:hover {
+  background: var(--bg-hover);
+}
+
+.item.active {
+  background: var(--bg-active);
+  color: var(--text-primary);
+}
+
+.chevron {
+  font-size: 8px;
+  transition: transform 0.15s;
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contextMenu {
+  position: fixed;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 4px 0;
+  min-width: 150px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  padding: 6px 14px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--bg-hover);
+}
+
+.danger {
+  color: var(--danger-color);
+}
+
+.editInput {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--accent-color);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 1px 4px;
+  outline: none;
+}

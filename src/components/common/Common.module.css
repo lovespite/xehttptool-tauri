@@ -1,0 +1,200 @@
+.keyValueTable {
+  font-size: 13px;
+}
+
+.keyValueTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.keyValueTable th {
+  text-align: left;
+  padding: 4px 8px;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.checkCol {
+  width: 32px;
+}
+
+.keyCol {
+  width: 45%;
+}
+
+.valueCol {
+  width: 45%;
+}
+
+.actionCol {
+  width: 32px;
+}
+
+.cellInput {
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.cellInput:focus {
+  outline: none;
+  background: var(--bg-hover);
+}
+
+.cellInput::placeholder {
+  color: var(--text-muted);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  accent-color: var(--accent-color);
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.deleteBtn:hover {
+  color: var(--danger-color);
+  background: rgba(243, 139, 168, 0.1);
+}
+
+.addRowBtn {
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: none;
+  border: 1px dashed var(--border-color);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.addRowBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.contextMenu {
+  position: fixed;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 4px 0;
+  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.contextMenuItem {
+  display: block;
+  width: 100%;
+  padding: 6px 16px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.contextMenuItem:hover {
+  background: var(--bg-hover);
+}
+
+.contextMenuItemDanger {
+  color: var(--danger-color);
+}
+
+.contextMenuDivider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.dialog {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 320px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.dialogTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.dialogInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-sidebar);
+  color: var(--text-primary);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.dialogInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialogBtn {
+  padding: 6px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.dialogBtn:hover {
+  background: var(--bg-hover);
+}
+
+.dialogBtnPrimary {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
+
+.dialogBtnPrimary:hover {
+  opacity: 0.9;
+}

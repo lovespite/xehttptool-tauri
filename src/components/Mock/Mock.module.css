@@ -1,0 +1,216 @@
+.panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.portLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.portInput {
+  width: 70px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.portInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.toggleBtn {
+  padding: 5px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.startBtn {
+  background: var(--success-color);
+  color: #1e1e2e;
+}
+
+.stopBtn {
+  background: var(--danger-color);
+  color: #fff;
+}
+
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(166, 227, 161, 0.1);
+  border: 1px solid rgba(166, 227, 161, 0.2);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--success-color);
+  margin-bottom: 12px;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success-color);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.routeList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.routeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.routeTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.addRouteBtn {
+  padding: 3px 10px;
+  background: none;
+  border: 1px dashed var(--border-color);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addRouteBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.routeCard {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.routeTop {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.methodSelect {
+  padding: 3px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  width: 80px;
+}
+
+.pathInput {
+  flex: 1;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.pathInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.statusInput {
+  width: 60px;
+  padding: 3px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.deleteRouteBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+}
+
+.deleteRouteBtn:hover {
+  color: var(--danger-color);
+}
+
+.bodyTextarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-sidebar);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  resize: vertical;
+}
+
+.bodyTextarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}

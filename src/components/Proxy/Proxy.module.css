@@ -1,0 +1,223 @@
+.panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.enabledToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.enabledToggle input {
+  cursor: pointer;
+}
+
+.fallbackRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.fallbackLabel {
+  white-space: nowrap;
+}
+
+.fallbackInput {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.fallbackInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.actionBar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.ruleList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.ruleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ruleTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.addRuleBtn {
+  padding: 3px 10px;
+  background: none;
+  border: 1px dashed var(--border-color);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addRuleBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.ruleCard {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+
+.ruleRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ruleEnableCheck {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.patternInput {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.patternInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.proxyUrlInput {
+  flex: 2;
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.proxyUrlInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.ruleActions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.moveBtn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.moveBtn:hover {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.deleteRuleBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+}
+
+.deleteRuleBtn:hover {
+  color: var(--danger-color);
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}

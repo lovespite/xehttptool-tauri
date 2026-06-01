@@ -1,0 +1,103 @@
+.editor {
+  font-size: 13px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 4px 8px;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.checkCol { width: 32px; }
+.keyCol { width: 35%; }
+.valueCol { width: 35%; }
+.scopeCol { width: 80px; }
+.actionCol { width: 32px; }
+
+.input {
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.input:focus {
+  outline: none;
+  background: var(--bg-hover);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.checkbox {
+  cursor: pointer;
+  accent-color: var(--accent-color);
+}
+
+.scopeBadge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.workspace {
+  background: rgba(137, 180, 250, 0.15);
+  color: #89b4fa;
+}
+
+.collection {
+  background: rgba(166, 227, 161, 0.15);
+  color: #a6e3a1;
+}
+
+.request {
+  background: rgba(249, 226, 175, 0.15);
+  color: #f9e2af;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.deleteBtn:hover {
+  color: var(--danger-color);
+  background: rgba(243, 139, 168, 0.1);
+}
+
+.addBtn {
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: none;
+  border: 1px dashed var(--border-color);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.addBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
