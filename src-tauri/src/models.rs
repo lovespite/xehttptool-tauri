@@ -88,6 +88,7 @@ pub struct HttpResponseData {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MockRouteConfig {
     pub id: String,
     pub method: String,
@@ -99,12 +100,14 @@ pub struct MockRouteConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MockServerConfig {
     pub port: u16,
     pub routes: Vec<MockRouteConfig>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MockServerStatus {
     pub running: bool,
     pub port: u16,

@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { useMockStore } from '../../store/useMockStore';
 import { useUIStore } from '../../store/useUIStore';
 import MockRouteEditor from './MockRouteEditor';
+import { startMockServer, stopMockServer, updateMockRoutes } from '../../services/tauri';
+import type { MockServerConfig } from '../../types';
 import styles from './Mock.module.css';
 
 export default function MockServerPanel() {
@@ -15,18 +18,35 @@ export default function MockServerPanel() {
   const isActive = rightPanel === 'mock';
   if (!isActive) return null;
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     if (running) {
-      // In real impl, call stop_mock_server via Tauri
-      setRunning(false);
-    } else {
-      // In real impl, call start_mock_server via Tauri
-      if (routes.length === 0) {
-        addRoute();
+      try {
+        await stopMockServer();
+        setRunning(false);
+      } catch (err) {
+        console.error('Failed to stop mock server', err);
       }
-      setRunning(true);
+    } else {
+      try {
+        if (routes.length === 0) {
+          addRoute();
+        }
+        const config: MockServerConfig = { port, routes };
+        await startMockServer(config);
+        setRunning(true);
+      } catch (err) {
+        console.error('Failed to start mock server', err);
+      }
     }
   };
+
+  // Sync routes to the running mock server whenever they change
+  useEffect(() => {
+    if (!running) return;
+    updateMockRoutes(routes).catch((err) =>
+      console.error('Failed to sync mock routes', err)
+    );
+  }, [routes, running]);
 
   return (
     <div className={styles.panel}>

@@ -19,6 +19,7 @@ pub fn run() {
             mock::start_mock_server,
             mock::stop_mock_server,
             mock::get_mock_server_status,
+            mock::update_mock_routes,
             persistence::load_all_workspaces,
             persistence::save_workspace,
             persistence::load_workspace,

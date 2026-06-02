@@ -1,5 +1,10 @@
 use crate::mock_server;
-use crate::models::{MockServerConfig, MockServerStatus};
+use crate::models::{MockRouteConfig, MockServerConfig, MockServerStatus};
+
+#[tauri::command]
+pub async fn update_mock_routes(routes: Vec<MockRouteConfig>) -> Result<(), String> {
+    mock_server::update_mock_routes(routes).await
+}
 
 #[tauri::command]
 pub async fn start_mock_server(config: MockServerConfig) -> Result<u16, String> {

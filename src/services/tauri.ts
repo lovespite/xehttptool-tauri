@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { HttpResponse, Workspace, MockServerConfig, MockServerStatus, ProxyConfig } from '../types';
+import type { HttpResponse, Workspace, MockRoute, MockServerConfig, MockServerStatus, ProxyConfig } from '../types';
 
 // === HTTP Request ===
 
@@ -68,6 +68,10 @@ export async function stopMockServer(): Promise<void> {
 
 export async function getMockServerStatus(): Promise<MockServerStatus> {
   return invoke('get_mock_server_status');
+}
+
+export async function updateMockRoutes(routes: MockRoute[]): Promise<void> {
+  return invoke('update_mock_routes', { routes });
 }
 
 // === Proxy ===

@@ -1,6 +1,5 @@
 use crate::models::{MockRouteConfig, MockServerConfig, MockServerStatus};
 use axum::extract::State;
-use axum::routing::any;
 use axum::{Json, Router};
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -14,6 +13,8 @@ pub struct MockAppState {
 pub struct MockServerInstance {
     handle: JoinHandle<()>,
     shutdown_tx: tokio::sync::oneshot::Sender<()>,
+    config: MockServerConfig,
+    routes_handle: Arc<Mutex<Vec<MockRouteConfig>>>,
 }
 
 static INSTANCE: once_cell::sync::Lazy<Mutex<Option<MockServerInstance>>> =
@@ -27,6 +28,13 @@ async fn handle_mock_request(
     let routes = state.routes.lock().await;
     let path = uri.path();
 
+    // Normalize path: strip trailing slash except for root
+    let normalized_path = if path != "/" {
+        path.trim_end_matches('/')
+    } else {
+        path
+    };
+
     // Find matching route
     for route in routes.iter() {
         if !route.enabled {
@@ -35,7 +43,12 @@ async fn handle_mock_request(
         if route.method != method.as_str() {
             continue;
         }
-        if route.path != path {
+        let route_path = if route.path != "/" {
+            route.path.trim_end_matches('/')
+        } else {
+            route.path.as_str()
+        };
+        if route_path != normalized_path {
             continue;
         }
 
@@ -60,12 +73,14 @@ pub async fn start_mock_server(config: MockServerConfig) -> Result<u16, String> 
         old.handle.await.unwrap_or_default();
     }
 
+    let instance_config = config.clone();
+    let routes_handle = Arc::new(Mutex::new(config.routes));
     let state = MockAppState {
-        routes: Arc::new(Mutex::new(config.routes)),
+        routes: routes_handle.clone(),
     };
 
     let app = Router::new()
-        .route("/{*path}", any(handle_mock_request))
+        .fallback(handle_mock_request)
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}", config.port))
@@ -85,7 +100,7 @@ pub async fn start_mock_server(config: MockServerConfig) -> Result<u16, String> 
             .ok();
     });
 
-    *instance = Some(MockServerInstance { handle, shutdown_tx });
+    *instance = Some(MockServerInstance { handle, shutdown_tx, config: instance_config, routes_handle });
 
     Ok(port)
 }
@@ -103,10 +118,31 @@ pub async fn stop_mock_server() -> Result<(), String> {
 
 pub async fn get_mock_server_status() -> MockServerStatus {
     let instance = INSTANCE.lock().await;
-    let running = instance.is_some();
-    MockServerStatus {
-        running,
-        port: 0,
-        routes: vec![],
+    match instance.as_ref() {
+        Some(srv) => {
+            let routes = srv.routes_handle.lock().await;
+            MockServerStatus {
+                running: true,
+                port: srv.config.port,
+                routes: routes.clone(),
+            }
+        }
+        None => MockServerStatus {
+            running: false,
+            port: 0,
+            routes: vec![],
+        },
+    }
+}
+
+pub async fn update_mock_routes(new_routes: Vec<MockRouteConfig>) -> Result<(), String> {
+    let instance = INSTANCE.lock().await;
+    match instance.as_ref() {
+        Some(srv) => {
+            let mut routes = srv.routes_handle.lock().await;
+            *routes = new_routes;
+            Ok(())
+        }
+        None => Err("Mock server is not running".to_string()),
     }
 }
