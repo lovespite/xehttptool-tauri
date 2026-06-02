@@ -199,6 +199,13 @@
   border-bottom-color: var(--accent-color);
 }
 
+.subTabSeparator {
+  width: 1px;
+  background: var(--border-color);
+  margin: 6px 8px;
+  flex-shrink: 0;
+}
+
 .headersContainer {
   flex: 1;
   overflow: auto;

@@ -25,6 +25,7 @@ export function useSendRequest() {
   const setLoading = useHttpStore((s) => s.setLoading);
   const setError = useHttpStore((s) => s.setError);
   const setLastRequestUrl = useHttpStore((s) => s.setLastRequestUrl);
+  const setLastRequestData = useHttpStore((s) => s.setLastRequestData);
   const pushConsoleEntries = useHttpStore((s) => s.pushConsoleEntries);
   const clearConsoleEntries = useHttpStore((s) => s.clearConsoleEntries);
 
@@ -169,6 +170,7 @@ export function useSendRequest() {
       }
 
       setLastRequestUrl(finalUrl);
+      setLastRequestData(enabledHeaders, bodyStr);
       setResponse(resp);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

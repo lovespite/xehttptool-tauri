@@ -4,6 +4,7 @@ mod http_client;
 mod mock_server;
 mod models;
 mod persistence;
+mod postman;
 mod proxy;
 
 use commands::http;

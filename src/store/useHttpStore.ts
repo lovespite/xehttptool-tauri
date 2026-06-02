@@ -9,12 +9,15 @@ interface HttpState {
   loading: boolean;
   error: string | null;
   lastRequestUrl: string | null;
+  lastRequestHeaders: { key: string; value: string; enabled: boolean }[] | null;
+  lastRequestBody: string | null;
   consoleEntries: ConsoleEntry[];
 
   setResponse: (r: HttpResponse | null) => void;
   setLoading: (l: boolean) => void;
   setError: (e: string | null) => void;
   setLastRequestUrl: (url: string) => void;
+  setLastRequestData: (headers: { key: string; value: string; enabled: boolean }[], body: string | null) => void;
   pushConsoleEntries: (entries: ConsoleEntry[]) => void;
   clearConsoleEntries: () => void;
 }
@@ -25,12 +28,15 @@ export const useHttpStore = create<HttpState>()(
     loading: false,
     error: null,
     lastRequestUrl: null,
+    lastRequestHeaders: null,
+    lastRequestBody: null,
     consoleEntries: [],
 
     setResponse: (r) => set((s) => { s.response = r; s.loading = false; s.error = null; }),
     setLoading: (l) => set((s) => { s.loading = l; if (l) { s.error = null; s.response = null; } }),
     setError: (e) => set((s) => { s.error = e; s.loading = false; }),
     setLastRequestUrl: (url) => set((s) => { s.lastRequestUrl = url; }),
+    setLastRequestData: (headers, body) => set((s) => { s.lastRequestHeaders = headers; s.lastRequestBody = body; }),
 
     pushConsoleEntries: (entries) => set((s) => {
       s.consoleEntries.push(...entries);

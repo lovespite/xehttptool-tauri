@@ -10,6 +10,193 @@ export interface ScriptContext {
   response: HttpResponse | null;
 }
 
+// ── Chained assertion class (pm.expect) ──
+
+class PmExpect {
+  private actual: unknown;
+  private isNegated: boolean;
+
+  constructor(actual: unknown) {
+    this.actual = actual;
+    this.isNegated = false;
+  }
+
+  // Syntactic sugar: .to and .be are no-ops
+  get to(): this {
+    return this;
+  }
+  get be(): this {
+    return this;
+  }
+
+  // Negation: .not flips the assertion
+  get not(): PmExpect {
+    const neg = new PmExpect(this.actual);
+    neg.isNegated = true;
+    return neg;
+  }
+
+  // ── Matchers ──
+
+  equal(expected: unknown) {
+    this.assert(
+      this.actual === expected,
+      `expected ${this.inspect(this.actual)} to equal ${this.inspect(expected)}`,
+    );
+  }
+
+  eql(expected: unknown) {
+    const match = JSON.stringify(this.actual) === JSON.stringify(expected);
+    this.assert(
+      match,
+      `expected ${this.inspect(this.actual)} to deeply equal ${this.inspect(expected)}`,
+    );
+  }
+
+  get undefined(): this {
+    this.assert(
+      this.actual === undefined,
+      `expected ${this.inspect(this.actual)} to be undefined`,
+    );
+    return this;
+  }
+
+  get null(): this {
+    this.assert(
+      this.actual === null,
+      `expected ${this.inspect(this.actual)} to be null`,
+    );
+    return this;
+  }
+
+  get empty(): this {
+    const isEmpty =
+      this.actual === undefined ||
+      this.actual === null ||
+      (typeof this.actual === 'string' && this.actual === '') ||
+      (Array.isArray(this.actual) && this.actual.length === 0) ||
+      (typeof this.actual === 'object' &&
+        this.actual !== null &&
+        Object.keys(this.actual as object).length === 0);
+    this.assert(
+      isEmpty,
+      `expected ${this.inspect(this.actual)} to be empty`,
+    );
+    return this;
+  }
+
+  get ok(): this {
+    this.assert(
+      !!this.actual,
+      `expected ${this.inspect(this.actual)} to be truthy`,
+    );
+    return this;
+  }
+
+  get true(): this {
+    this.assert(
+      this.actual === true,
+      `expected ${this.inspect(this.actual)} to be true`,
+    );
+    return this;
+  }
+
+  get false(): this {
+    this.assert(
+      this.actual === false,
+      `expected ${this.inspect(this.actual)} to be false`,
+    );
+    return this;
+  }
+
+  oneOf(arr: unknown[]) {
+    const isIn = Array.isArray(arr) && arr.includes(this.actual);
+    this.assert(
+      isIn,
+      `expected ${this.inspect(this.actual)} to be one of ${this.inspect(arr)}`,
+    );
+  }
+
+  a(type: string) {
+    const actualType = typeof this.actual;
+    const pass =
+      type === 'array'
+        ? Array.isArray(this.actual)
+        : actualType === type;
+    this.assert(
+      pass,
+      `expected ${this.inspect(this.actual)} to be of type ${type}, got ${Array.isArray(this.actual) ? 'array' : actualType}`,
+    );
+  }
+
+  include(substring: string) {
+    const includes =
+      typeof this.actual === 'string' && this.actual.includes(substring);
+    this.assert(
+      includes,
+      `expected ${this.inspect(this.actual)} to include "${substring}"`,
+    );
+  }
+
+  property(key: string) {
+    const has =
+      this.actual !== null &&
+      typeof this.actual === 'object' &&
+      key in (this.actual as Record<string, unknown>);
+    this.assert(
+      has,
+      `expected ${this.inspect(this.actual)} to have property "${key}"`,
+    );
+  }
+
+  lengthOf(n: number) {
+    const len = (this.actual as { length?: number })?.length;
+    this.assert(
+      typeof len === 'number' && len === n,
+      `expected ${this.inspect(this.actual)} to have length ${n}, got ${len}`,
+    );
+  }
+
+  above(n: number) {
+    const pass = typeof this.actual === 'number' && this.actual > n;
+    this.assert(
+      pass,
+      `expected ${this.inspect(this.actual)} to be above ${n}`,
+    );
+  }
+
+  below(n: number) {
+    const pass = typeof this.actual === 'number' && this.actual < n;
+    this.assert(
+      pass,
+      `expected ${this.inspect(this.actual)} to be below ${n}`,
+    );
+  }
+
+  match(regexp: RegExp) {
+    const pass =
+      typeof this.actual === 'string' && regexp.test(this.actual);
+    this.assert(
+      pass,
+      `expected ${this.inspect(this.actual)} to match ${regexp}`,
+    );
+  }
+
+  private inspect(val: unknown): string {
+    try {
+      return JSON.stringify(val);
+    } catch {
+      return String(val);
+    }
+  }
+
+  private assert(pass: boolean, failMsg: string) {
+    if (this.isNegated ? pass : !pass) {
+      throw new Error(failMsg);
+    }
+  }
+}
+
 /**
  * Execute a user script in a sandboxed context with the `pm` API.
  * Returns any modified variables per scope.
@@ -40,13 +227,18 @@ export async function executeScript(
     workspace: ctx.setWorkspaceVariables,
   };
 
-  // Build the pm object
+  const newVarId = () =>
+    `script-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
+  // ── Build the pm object ──
+
   const pm: Record<string, unknown> = {
+    // ── Variables API (multi-scope) ──
     variables: {
       get: (name: string): string | undefined => {
         for (const scope of ['request', 'collection', 'workspace'] as VariableScope[]) {
           const found = scopeGetters[scope]().find(
-            (v: Variable) => v.key === name && v.enabled
+            (v: Variable) => v.key === name && v.enabled,
           );
           if (found) return found.value;
         }
@@ -58,12 +250,12 @@ export async function executeScript(
         if (existing) {
           scopeSetters[scope](
             vars.map((v: Variable) =>
-              v.key === name ? { ...v, value } : v
-            )
+              v.key === name ? { ...v, value } : v,
+            ),
           );
         } else {
           const newVar: Variable = {
-            id: `script-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            id: newVarId(),
             key: name,
             value,
             scope,
@@ -74,73 +266,106 @@ export async function executeScript(
       },
       unset: (name: string, scope: VariableScope) => {
         scopeSetters[scope](
-          scopeGetters[scope]().filter((v: Variable) => v.key !== name)
+          scopeGetters[scope]().filter((v: Variable) => v.key !== name),
         );
       },
       clear: (scope: VariableScope) => {
         scopeSetters[scope]([]);
       },
     },
+
+    // ── Collection-variables shorthand ──
+    collectionVariables: {
+      get: (name: string): string | undefined => {
+        const found = ctx
+          .getCollectionVariables()
+          .find((v: Variable) => v.key === name && v.enabled);
+        return found?.value;
+      },
+      set: (name: string, value: string) => {
+        const vars = ctx.getCollectionVariables();
+        const existing = vars.find((v: Variable) => v.key === name);
+        if (existing) {
+          ctx.setCollectionVariables(
+            vars.map((v: Variable) =>
+              v.key === name ? { ...v, value } : v,
+            ),
+          );
+        } else {
+          const newVar: Variable = {
+            id: newVarId(),
+            key: name,
+            value,
+            scope: 'collection',
+            enabled: true,
+          };
+          ctx.setCollectionVariables([...vars, newVar]);
+        }
+      },
+      unset: (name: string) => {
+        ctx.setCollectionVariables(
+          ctx.getCollectionVariables().filter((v: Variable) => v.key !== name),
+        );
+      },
+    },
+
+    // ── Expect / assertion API (available in both pre-request and test) ──
+    expect: (actual: unknown) => new PmExpect(actual),
+
+    // ── Test wrapper ──
+    test: (name: string, fn: () => void) => {
+      try {
+        fn();
+        console.log(`✓ ${name}`);
+      } catch (e) {
+        console.error(
+          `✗ ${name}:${e instanceof Error ? ' ' + e.message : ' ' + String(e)}`,
+        );
+      }
+    },
   };
 
-  // Test scripts also get response access
+  // ── Response API (test scripts only) ──
   if (scriptType === 'test' && ctx.response) {
-    pm.response = {
-      status: ctx.response.status,
-      statusText: ctx.response.statusText,
+    const resp = ctx.response;
+    const responseApi: Record<string, unknown> = {
+      status: resp.status,
+      code: resp.status,
+      statusText: resp.statusText,
       headers: Object.fromEntries(
-        Object.entries(ctx.response.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(', ') : v])
+        Object.entries(resp.headers).map(([k, v]) => [
+          k,
+          Array.isArray(v) ? v.join(', ') : v,
+        ]),
       ),
-      body: ctx.response.body,
+      body: resp.body,
+      timing: resp.timing,
       json: () => {
         try {
-          return JSON.parse(ctx.response!.body);
+          return JSON.parse(resp.body);
         } catch {
           return null;
         }
       },
-      timing: ctx.response.timing,
     };
-
-    pm.expect = (actual: unknown) => ({
-      to: {
-        be: (expected: unknown) => {
-          if (actual !== expected) {
-            throw new Error(`Expected ${JSON.stringify(actual)} to be ${JSON.stringify(expected)}`);
-          }
-        },
-        equal: (expected: unknown) => {
-          if (actual !== expected) {
-            throw new Error(`Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`);
-          }
-        },
-        include: (substring: string) => {
-          if (typeof actual === 'string' && !actual.includes(substring)) {
-            throw new Error(`Expected "${actual}" to include "${substring}"`);
-          }
-        },
-        a: (type: string) => {
-          const actualType = typeof actual;
-          if (actualType !== type) {
-            throw new Error(`Expected type ${type}, got ${actualType}`);
-          }
-        },
-      },
-      not: {
-        equal: (expected: unknown) => {
-          if (actual === expected) {
-            throw new Error(`Expected ${JSON.stringify(actual)} not to equal ${JSON.stringify(expected)}`);
-          }
-        },
-      },
-    });
+    pm.response = responseApi;
   }
 
-  // Override console methods to capture output
-  const originalConsole: Console = { ...console };
-  const capture = (method: "log" | "info" | "warn" | "error" | "assert", args: any[]) => {
-    originalConsole[method](...args);
-    logs.push(`[${method}] ${args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ')}`);
+  // ── Console capture ──
+
+  const originalConsole: Partial<Console> = { ...console };
+  const capture = (
+    method: 'log' | 'info' | 'warn' | 'error' | 'assert',
+    args: unknown[],
+  ) => {
+    (originalConsole[method] as Function)(...args);
+    logs.push(
+      `[${method}] ${args
+        .map((a) =>
+          typeof a === 'string' ? a : JSON.stringify(a),
+        )
+        .join(' ')}`,
+    );
   };
   console.log = (...args) => capture('log', args);
   console.info = (...args) => capture('info', args);
@@ -154,8 +379,9 @@ export async function executeScript(
     Object.assign(console, originalConsole);
   };
 
+  // ── Execute ──
+
   try {
-    // Wrap the user code in an async function that receives pm
     const wrappedCode = `
       (async (pm) => {
         ${code}
@@ -183,32 +409,40 @@ export async function executeScript(
   };
 }
 
-/**
- * Generate a template pre-request script
- */
+// ── Templates ──
+
 export function getPreRequestTemplate(): string {
   return `// Pre-request Script
 // Access and modify variables before the request is sent
-// console.log(pm.variables.get('myVar'));
-// pm.variables.set('timestamp', Date.now().toString(), 'request');
+
+// Set a variable that will be resolved via {{variable}} in the request
+// pm.variables.set("timestamp", Date.now().toString(), "request");
+// pm.collectionVariables.set("baseUrl", "https://api.example.com");
+
+// Log variable values
+// console.log(pm.variables.get("baseUrl"));
 `;
 }
 
-/**
- * Generate a template test script
- */
 export function getTestTemplate(): string {
   return `// Test Script
-// Validate the response and modify variables
+// Validate the response and manipulate variables
 
-// Example: check status code
-// pm.expect(pm.response.status).to.equal(200);
+pm.test("Status code is 200", function () {
+  pm.expect(pm.response.code).to.equal(200);
+});
 
-// Example: check response body
+pm.test("Response has body", function () {
+  pm.expect(pm.response.body).to.not.be.empty;
+});
+
+// Parse JSON response body
 // const json = pm.response.json();
-// pm.expect(json.success).to.be(true);
+// pm.test("Response has token", function () {
+//   pm.expect(json.token).to.not.be.undefined;
+// });
 
-// Example: save response data to a variable
-// pm.variables.set('token', json.token, 'collection');
+// Save a value to a collection variable
+// pm.collectionVariables.set("token", json.token);
 `;
 }

@@ -1,4 +1,5 @@
 use crate::models::{WorkspaceData, WorkspaceMeta};
+use crate::postman;
 use std::fs;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -93,6 +94,15 @@ pub fn import_workspaces_from_file(path: String) -> Result<Vec<WorkspaceData>, S
     let parsed: serde_json::Value =
         serde_json::from_str(&content).map_err(|e| format!("Invalid JSON: {}", e))?;
 
+    // Auto-detect Postman Collection v2.1 format
+    if postman::is_postman_collection(&parsed) {
+        let collection: postman::PostmanCollection = serde_json::from_value(parsed)
+            .map_err(|e| format!("Invalid Postman collection: {}", e))?;
+        let workspace = postman::convert_collection(collection);
+        return Ok(vec![workspace]);
+    }
+
+    // Native xehttptool format
     let workspaces: Vec<WorkspaceData> = serde_json::from_value(parsed["workspaces"].clone())
         .map_err(|e| format!("Invalid workspace format: {}", e))?;
 

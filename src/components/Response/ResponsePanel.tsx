@@ -14,7 +14,7 @@ function generateId(): string {
 }
 
 export default function ResponsePanel() {
-  const [responseTab, setResponseTab] = useState<'body' | 'headers'>('body');
+  const [responseTab, setResponseTab] = useState<'response-body' | 'response-headers' | 'request-headers' | 'request-body'>('response-body');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -28,6 +28,8 @@ export default function ResponsePanel() {
   const response = useHttpStore((s) => s.response);
   const loading = useHttpStore((s) => s.loading);
   const error = useHttpStore((s) => s.error);
+  const lastRequestHeaders = useHttpStore((s) => s.lastRequestHeaders);
+  const lastRequestBody = useHttpStore((s) => s.lastRequestBody);
   const rightPanel = useUIStore((s) => s.rightPanel);
   const setRightPanel = useUIStore((s) => s.setRightPanel);
   const activeRequest = useWorkspaceStore((s) => s.getActiveRequest());
@@ -128,24 +130,53 @@ export default function ResponsePanel() {
         </div>
         <div className={styles.subTabBar}>
           <button
-            className={`${styles.subTabBtn} ${responseTab === 'body' ? styles.activeSubTab : ''}`}
-            onClick={() => setResponseTab('body')}
+            className={`${styles.subTabBtn} ${responseTab === 'response-body' ? styles.activeSubTab : ''}`}
+            onClick={() => setResponseTab('response-body')}
           >
-            Body
+            Response Body
           </button>
           <button
-            className={`${styles.subTabBtn} ${responseTab === 'headers' ? styles.activeSubTab : ''}`}
-            onClick={() => setResponseTab('headers')}
+            className={`${styles.subTabBtn} ${responseTab === 'response-headers' ? styles.activeSubTab : ''}`}
+            onClick={() => setResponseTab('response-headers')}
           >
-            Headers
+            Response Headers
+          </button>
+          <span className={styles.subTabSeparator} />
+          <button
+            className={`${styles.subTabBtn} ${responseTab === 'request-headers' ? styles.activeSubTab : ''}`}
+            onClick={() => setResponseTab('request-headers')}
+          >
+            Request Headers
+          </button>
+          <button
+            className={`${styles.subTabBtn} ${responseTab === 'request-body' ? styles.activeSubTab : ''}`}
+            onClick={() => setResponseTab('request-body')}
+          >
+            Request Body
           </button>
         </div>
-        {responseTab === 'body' ? (
+        {responseTab === 'response-body' ? (
           <div className={styles.body}>
             <pre className={styles.code}>{response.body}</pre>
           </div>
-        ) : (
+        ) : responseTab === 'response-headers' ? (
           <ResponseHeaders headers={response.headers} />
+        ) : responseTab === 'request-headers' ? (
+          <ResponseHeaders headers={(() => {
+            const map: Record<string, string[]> = {};
+            if (lastRequestHeaders) {
+              for (const h of lastRequestHeaders) {
+                if (!h.enabled) continue;
+                if (!map[h.key]) map[h.key] = [];
+                map[h.key].push(h.value);
+              }
+            }
+            return map;
+          })()} />
+        ) : (
+          <div className={styles.body}>
+            <pre className={styles.code}>{lastRequestBody ?? 'No request body'}</pre>
+          </div>
         )}
       </>
     );
