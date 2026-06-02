@@ -18,13 +18,15 @@ jobs:
         include:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            bundle: nsis
+            bundle: nsis,msi
             artifact-name: xehttptool-windows-amd64
+            upload-path: src-tauri/target/release/bundle/
 
           - os: macos-latest
             target: aarch64-apple-darwin
             bundle: dmg
             artifact-name: xehttptool-macos-apple-silicon
+            upload-path: src-tauri/target/release/bundle/dmg/
 
     runs-on: ${{ matrix.os }}
 
@@ -55,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
-          path: src-tauri/target/release/bundle/${{ matrix.bundle }}/
+          path: ${{ matrix.upload-path }}
 
   release:
     if: startsWith(github.ref, 'refs/tags/')
@@ -81,5 +83,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            release/**/*
+            release/windows/**/*.exe
+            release/windows/**/*.msi
+            release/macos/*.dmg
+            release/macos/*.app
           generate_release_notes: true

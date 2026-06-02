@@ -14,9 +14,10 @@ interface Props {
   language: 'javascript' | 'json' | 'xml' | 'text';
   placeholder?: string;
   minHeight?: string;
+  readOnly?: boolean;
 }
 
-export default function CodeEditor({ value, onChange, language, placeholder, minHeight = '150px' }: Props) {
+export default function CodeEditor({ value, onChange, language, placeholder, minHeight = '150px', readOnly = false }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
@@ -25,11 +26,19 @@ export default function CodeEditor({ value, onChange, language, placeholder, min
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const extensions = [basicSetup, catppuccinMocha, catppuccinHighlight, EditorView.updateListener.of((update) => {
-      if (update.docChanged) {
-        onChangeRef.current(update.state.doc.toString());
-      }
-    })];
+    const extensions = [basicSetup, catppuccinMocha, catppuccinHighlight];
+
+    if (!readOnly) {
+      extensions.push(EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          onChangeRef.current(update.state.doc.toString());
+        }
+      }));
+    }
+
+    if (readOnly) {
+      extensions.push(EditorView.editable.of(false));
+    }
 
     if (placeholder) {
       extensions.push(placeholderExt(placeholder));

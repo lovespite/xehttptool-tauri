@@ -24,7 +24,8 @@ function DetailView({ entry, onBack }: { entry: NonNullable<ReturnType<typeof us
   const resHeadersRaw = rs.headers as Record<string, string[]> | undefined;
   const resHeaders = resHeadersRaw ? Object.entries(resHeadersRaw) : [];
 
-  const reqBody = rd.body as { type?: string; raw?: string } | undefined;
+  const reqBody = rd.body as { type?: string; raw?: string; formData?: { key: string; value: string; enabled: boolean }[] } | undefined;
+  const sentBody = rd._sentBody as string | undefined;
   const resBody = typeof rs.body === 'string' ? rs.body : undefined;
 
   return (
@@ -72,8 +73,17 @@ function DetailView({ entry, onBack }: { entry: NonNullable<ReturnType<typeof us
         )}
 
         {detailTab === 'reqBody' && (
-          reqBody?.raw ? (
+          sentBody ? (
+            <pre className={styles.detailPre}>{sentBody}</pre>
+          ) : reqBody?.raw ? (
             <pre className={styles.detailPre}>{reqBody.raw}</pre>
+          ) : reqBody?.formData && reqBody.formData.length > 0 ? (
+            <pre className={styles.detailPre}>
+              {reqBody.formData
+                .filter(f => f.enabled !== false)
+                .map(f => `${f.key}=${f.value}`)
+                .join('&')}
+            </pre>
           ) : (
             <p className={styles.detailEmpty}>No request body</p>
           )

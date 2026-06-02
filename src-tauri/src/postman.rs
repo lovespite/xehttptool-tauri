@@ -28,6 +28,7 @@ pub struct PostmanInfo {
     #[serde(default)]
     pub _postman_id: Option<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     pub schema: Option<String>,
 }
 
@@ -71,15 +72,6 @@ pub struct PostmanHeader {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct PostmanQueryParam {
-    pub key: String,
-    #[serde(default)]
-    pub value: Option<String>,
-    #[serde(default)]
-    pub disabled: Option<bool>,
-}
-
-#[derive(Debug, Deserialize)]
 pub struct PostmanBody {
     #[serde(default)]
     pub mode: Option<String>,
@@ -101,9 +93,11 @@ pub struct PostmanFormParam {
     #[serde(default)]
     pub value: Option<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     pub src: Option<String>,
     #[serde(rename = "type")]
     #[serde(default)]
+    #[allow(dead_code)]
     pub param_type: Option<String>,
     #[serde(default)]
     pub disabled: Option<bool>,
@@ -122,6 +116,7 @@ pub struct PostmanScript {
     #[serde(default)]
     pub exec: Option<serde_json::Value>,
     #[serde(default)]
+    #[allow(dead_code)]
     pub script_type: Option<String>,
 }
 
@@ -133,6 +128,7 @@ pub struct PostmanVariable {
     pub value: Option<serde_json::Value>,
     #[serde(rename = "type")]
     #[serde(default)]
+    #[allow(dead_code)]
     pub var_type: Option<String>,
     #[serde(default)]
     pub disabled: Option<bool>,

@@ -95,3 +95,17 @@ export async function exportProxyRules(path: string, config: ProxyConfig): Promi
 export async function importProxyRules(path: string): Promise<ProxyConfig> {
   return invoke('import_proxy_rules', { path });
 }
+
+// === File Operations ===
+
+export async function writeTempFile(data: string, extension: string): Promise<string> {
+  return invoke('write_temp_file', { data, extension });
+}
+
+export async function moveFile(from: string, to: string): Promise<void> {
+  return invoke('move_file', { from, to });
+}
+
+export async function deleteFile(path: string): Promise<void> {
+  return invoke('delete_file', { path });
+}

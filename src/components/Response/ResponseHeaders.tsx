@@ -10,7 +10,7 @@ export default function ResponseHeaders({ headers }: Props) {
   if (entries.length === 0) {
     return (
       <div className={styles.center}>
-        <p className={styles.hint}>No response headers</p>
+        <p className={styles.hint}>No response/request headers</p>
       </div>
     );
   }
