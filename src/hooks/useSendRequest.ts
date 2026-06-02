@@ -127,7 +127,10 @@ export function useSendRequest() {
         const params = new URLSearchParams();
         (req.body.formData ?? [])
           .filter((f) => f.enabled)
-          .forEach((f) => params.append(f.key, f.value));
+          .forEach((f) => params.append(
+            resolveVariablesInString(f.key, varCtx),
+            resolveVariablesInString(f.value, varCtx)
+          ));
         bodyStr = params.toString();
         contentType = req.body.type === 'form-data' ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
       }
