@@ -3,6 +3,8 @@ import './App.css';
 import AppLayout from './components/Layout/AppLayout';
 import { loadAllFromDisk } from './services/persistence';
 import { useProxyStore } from './store/useProxyStore';
+import { getVersion } from '@tauri-apps/api/app';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -11,6 +13,7 @@ function App() {
     Promise.all([
       loadAllFromDisk(),
       useProxyStore.getState().loadFromDisk(),
+      getVersion().then((v) => getCurrentWindow().setTitle(`xehttptool v${v}`)),
     ]).finally(() => setLoading(false));
   }, []);
 
