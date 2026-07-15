@@ -21,6 +21,7 @@ export default function ResponsePanel() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [formattedBody, setFormattedBody] = useState<string | null>(null);
+  const [forceFormattedBody, setForceFormattedBody] = useState<string | null>(null);
   const [showFullBody, setShowFullBody] = useState(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -45,6 +46,7 @@ export default function ResponsePanel() {
   useEffect(() => {
     if (!response) {
       setFormattedBody(null);
+      setForceFormattedBody(null);
       setShowFullBody(false);
       return;
     }
@@ -55,6 +57,7 @@ export default function ResponsePanel() {
     } else {
       setFormattedBody(null);
     }
+    setForceFormattedBody(null);
     setShowFullBody(false);
   }, [response]);
 
@@ -67,6 +70,15 @@ export default function ResponsePanel() {
       setFormattedBody(formatXML(response.body));
     }
   }, [response]);
+
+  const handleForceFormat = useCallback(() => {
+    if (!response) return;
+    const formatted = formatJSON(response.body);
+    if (formatted !== response.body) {
+      setForceFormattedBody(formatted);
+    }
+  }, [response]);
+
   const renderResponse = () => {
     if (loading) {
       return (
@@ -209,7 +221,7 @@ export default function ResponsePanel() {
               return (
                 <div className={styles.cmContainer}>
                   <div className={styles.cmToolbar}>
-                    {!showFormatted && bodySize <= 1024 * 1024 && (
+                    {!showFormatted && (
                       <button className={styles.formatBtn} onClick={handleFormat}>Format</button>
                     )}
                     {truncated && (
@@ -221,21 +233,56 @@ export default function ResponsePanel() {
                       </span>
                     )}
                   </div>
-                  <CodeEditor
-                    value={displayTruncated}
-                    onChange={() => {}}
-                    language={lang}
-                    readOnly={true}
-                    minHeight="200px"
-                  />
+                  <div className={styles.cmEditorWrap}>
+                    <CodeEditor
+                      value={displayTruncated}
+                      onChange={() => {}}
+                      language={lang}
+                      readOnly={true}
+                      minHeight="200px"
+                      lineWrapping={true}
+                    />
+                  </div>
+                </div>
+              );
+            }
+
+            if (forceFormattedBody) {
+              return (
+                <div className={styles.cmContainer}>
+                  <div className={styles.cmToolbar}>
+                    <button className={styles.formatBtn} onClick={handleForceFormat}>
+                      Format as JSON
+                    </button>
+                    <button className={styles.formatBtn} onClick={() => setForceFormattedBody(null)}>
+                      Show Raw
+                    </button>
+                  </div>
+                  <div className={styles.cmEditorWrap}>
+                    <CodeEditor
+                      value={forceFormattedBody}
+                      onChange={() => {}}
+                      language="json"
+                      readOnly={true}
+                      minHeight="200px"
+                      lineWrapping={true}
+                    />
+                  </div>
                 </div>
               );
             }
 
             return (
-              <div className={styles.body}>
-                <pre className={styles.code}>{response.body}</pre>
-              </div>
+              <>
+                <div className={styles.cmToolbar}>
+                  <button className={styles.formatBtn} onClick={handleForceFormat}>
+                    Format as JSON
+                  </button>
+                </div>
+                <div className={styles.body}>
+                  <pre className={styles.code}>{response.body}</pre>
+                </div>
+              </>
             );
           })() : (
             <div className={styles.center}>

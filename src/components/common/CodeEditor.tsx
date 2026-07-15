@@ -15,9 +15,10 @@ interface Props {
   placeholder?: string;
   minHeight?: string;
   readOnly?: boolean;
+  lineWrapping?: boolean;
 }
 
-export default function CodeEditor({ value, onChange, language, placeholder, minHeight = '150px', readOnly = false }: Props) {
+export default function CodeEditor({ value, onChange, language, placeholder, minHeight = '150px', readOnly = false, lineWrapping = false }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
@@ -38,6 +39,10 @@ export default function CodeEditor({ value, onChange, language, placeholder, min
 
     if (readOnly) {
       extensions.push(EditorView.editable.of(false));
+    }
+
+    if (lineWrapping) {
+      extensions.push(EditorView.lineWrapping);
     }
 
     if (placeholder) {
